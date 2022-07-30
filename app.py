@@ -40,6 +40,10 @@ class Venue(db.Model):
     phone = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
+    genre = db.Column(db.String())
+    website_link = db.Column(db.String())
+    description = db.Column(db.String())
+    looking = db.Column(db.Boolean)
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
