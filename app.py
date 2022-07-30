@@ -3,7 +3,7 @@
 #----------------------------------------------------------------------------#
 
 import json
-from dateutil import parser
+import dateutil
 import babel
 from flask import Flask, render_template, request, Response, flash, redirect, url_for
 from flask_moment import Moment
@@ -20,6 +20,7 @@ app = Flask(__name__)
 moment = Moment(app)
 app.config.from_object('config')
 db = SQLAlchemy(app)
+migrate = Migrate(db,app)
 
 # TODO: connect to a local postgresql database
 
