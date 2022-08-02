@@ -61,15 +61,23 @@ class Artist(db.Model):
     website_link = db.Column(db.String())
     desc = db.Column(db.String())
     looking = db.Column(db.Boolean)
-
+    shows = db.relationship('show')
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
 
 
-Class Shows(db.Model):
-  __tablename__ = shows
+class Show(db.Model):
+  __tablename__ = 'show'
+
+  id = db.Column(db.Integer, primary_key=True)
+  artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'), nullable=False)
+  venue_id = db.Column(db.Integer, db.ForeignKey('venue.id'), nullable=False)
+  time = db.Column(db.DateTime)
+
+
+
 
 
 #----------------------------------------------------------------------------#
