@@ -44,6 +44,7 @@ class Venue(db.Model):
     website_link = db.Column(db.String())
     description = db.Column(db.String())
     looking = db.Column(db.Boolean)
+    shows = db.relationship('Show', backref="venue", lazy=True)
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
@@ -61,7 +62,7 @@ class Artist(db.Model):
     website_link = db.Column(db.String())
     desc = db.Column(db.String())
     looking = db.Column(db.Boolean)
-    shows = db.relationship('show')
+    shows = db.relationship('Show')
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
@@ -110,6 +111,13 @@ def index():
 def venues():
   # TODO: replace with real venues data.
   #       num_upcoming_shows should be aggregated based on number of upcoming shows per venue.
+  print("logggger")
+  data2 = Venue.query.get(id)
+  # print(data2)
+
+
+
+
   data=[{
     "city": "San Francisco",
     "state": "CA",
