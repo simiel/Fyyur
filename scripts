@@ -1,2 +1,3 @@
 cd desktop/projects/fyyur
 pg_ctl -D "C://Program files/PostgreSQL/14/data" start
+venv\Scripts\activate
