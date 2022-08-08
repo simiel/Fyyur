@@ -3,7 +3,7 @@
 #----------------------------------------------------------------------------#
 
 import json
-import dateutil
+import dateutil.parser
 import babel
 from flask import Flask, render_template, request, Response, flash, redirect, url_for
 from flask_moment import Moment
@@ -240,6 +240,19 @@ def show_venue(venue_id):
     "upcoming_shows_count": 1,
   }
   data = list(filter(lambda d: d['id'] == venue_id, [data1, data2, data3]))[0]
+
+
+  venue = Venue.query.get(venue_id)
+
+  if not venue:
+    return render_template('errors/404.html')
+
+
+
+
+
+
+
   return render_template('pages/show_venue.html', venue=data)
 
 #  Create Venue
