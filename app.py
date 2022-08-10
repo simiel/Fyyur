@@ -41,7 +41,6 @@ class Venue(db.Model):
     phone = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
-    genre = db.Column(db.String())
     website_link = db.Column(db.String())
     description = db.Column(db.String())
     looking = db.Column(db.Boolean)
@@ -386,7 +385,7 @@ def search_artists():
     data.append({
       "id": result.id,
       "name": result.name,
-      "num_upcoming_shows": len(db.session.query(Show).filter(Show.artist_id == result.id).filter(Show.start_time > datetime.now()).all()),
+      "num_upcoming_shows": len(db.session.query(Show).filter(Show.artist_id == result.id).filter(Show.time > datetime.now()).all()),
     })
   
   response={
@@ -405,7 +404,7 @@ def show_artist(artist_id):
   if not artist_query: 
     return render_template('errors/404.html')
 
-  past_shows_query = db.session.query(Show).join(Venue).filter(Show.artist_id==artist_id).filter(Show.start_time>datetime.now()).all()
+  past_shows_query = db.session.query(Show).join(Venue).filter(Show.artist_id==artist_id).filter(Show.time>datetime.now()).all()
   past_shows = []
 
   for show in past_shows_query:
@@ -413,10 +412,10 @@ def show_artist(artist_id):
       "venue_id": show.venue_id,
       "venue_name": show.venue.name,
       "artist_image_link": show.venue.image_link,
-      "start_time": show.start_time.strftime('%Y-%m-%d %H:%M:%S')
+      "start_time": show.time.strftime('%Y-%m-%d %H:%M:%S')
     })
 
-  upcoming_shows_query = db.session.query(Show).join(Venue).filter(Show.artist_id==artist_id).filter(Show.start_time>datetime.now()).all()
+  upcoming_shows_query = db.session.query(Show).join(Venue).filter(Show.artist_id==artist_id).filter(Show.time>datetime.now()).all()
   upcoming_shows = []
 
   for show in upcoming_shows_query:
@@ -424,7 +423,7 @@ def show_artist(artist_id):
       "venue_id": show.venue_id,
       "venue_name": show.venue.name,
       "artist_image_link": show.venue.image_link,
-      "start_time": show.start_time.strftime('%Y-%m-%d %H:%M:%S')
+      "start_time": show.time.strftime('%Y-%m-%d %H:%M:%S')
     })
 
 
@@ -435,10 +434,10 @@ def show_artist(artist_id):
     "city": artist_query.city,
     "state": artist_query.state,
     "phone": artist_query.phone,
-    "website": artist_query.website,
+    "website": artist_query.website_link,
     "facebook_link": artist_query.facebook_link,
-    "seeking_venue": artist_query.seeking_venue,
-    "seeking_description": artist_query.seeking_description,
+    "seeking_venue": artist_query.looking,
+    "seeking_description": artist_query.desc,
     "image_link": artist_query.image_link,
     "past_shows": past_shows,
     "upcoming_shows": upcoming_shows,
@@ -525,11 +524,11 @@ def create_artist_submission():
     genres = request.form.getlist('genres'),
     facebook_link = request.form['facebook_link']
     image_link = request.form['image_link']
-    website = request.form['website']
+    website = request.form['website_link']
     seeking_venue = True if 'seeking_venue' in request.form else False
     seeking_description = request.form['seeking_description']
 
-    artist = Artist(name=name, city=city, state=state, phone=phone, genres=genres, facebook_link=facebook_link, image_link=image_link, website_link=website, seeking=seeking_venue, desc=seeking_description)
+    artist = Artist(name=name, city=city, state=state, phone=phone, genres=genres, facebook_link=facebook_link, image_link=image_link, website_link=website, looking=seeking_venue, desc=seeking_description)
     db.session.add(artist)
     db.session.commit()
   except: 
