@@ -26,58 +26,8 @@ migrate = Migrate(app, db, compare_type=True)
 
 # TODO: connect to a local postgresql database
 
-#----------------------------------------------------------------------------#
-# Models.
-#----------------------------------------------------------------------------#
 
-class Venue(db.Model):
-    __tablename__ = 'venue'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    city = db.Column(db.String(120))
-    state = db.Column(db.String(120))
-    address = db.Column(db.String(120))
-    phone = db.Column(db.String(120))
-    image_link = db.Column(db.String(500))
-    facebook_link = db.Column(db.String(120))
-    website_link = db.Column(db.String())
-    description = db.Column(db.String())
-    looking = db.Column(db.Boolean)
-    genres = db.Column(db.ARRAY(db.String()))
-    shows = db.relationship('Show', backref="venue", lazy=True)
-
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
-
-class Artist(db.Model):
-    __tablename__ = 'artist'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    city = db.Column(db.String(120))
-    state = db.Column(db.String(120))
-    phone = db.Column(db.String(120))
-    genres = db.Column(db.ARRAY(db.String()))
-    image_link = db.Column(db.String(500))
-    facebook_link = db.Column(db.String(120))
-    website_link = db.Column(db.String())
-    desc = db.Column(db.String())
-    looking = db.Column(db.Boolean)
-    shows = db.relationship('Show', backref="artist", lazy=True)
-
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
-
-# TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
-
-
-class Show(db.Model):
-  __tablename__ = 'show'
-
-  id = db.Column(db.Integer, primary_key=True)
-  artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'), nullable=False)
-  venue_id = db.Column(db.Integer, db.ForeignKey('venue.id'), nullable=False)
-  time = db.Column(db.DateTime)
-
+from models import *
 
 
 
@@ -113,13 +63,13 @@ def index():
 def venues():
   # TODO: replace with real venues data.
   #       num_upcoming_shows should be aggregated based on number of upcoming shows per venue.
-  all_areas = Venue.query.with_entities(func.count(Venue.id), Venue.city, Venue.state).group_by(Venue.city, Venue.state).all()
+  # all_areas = Venue.query.with_entities(func.count(Venue.id), Venue.city, Venue.state).group_by(Venue.city, Venue.state).all()
 
-  # all_areas = Venue.query.
+  all_areas = db.session.query(func.count(Venue.id), Venue.city, Venue.state).group_by(Venue.city, Venue.state).all()
   data = []
 
   for area in all_areas:
-    area_venues = Venue.query.filter_by(state=area.state).filter_by(city=area.city).all()
+    area_venues = Venue.query.filter(Venue.state==area.state).filter(Venue.city==area.city).all()
     venue_data = []
     for venue in area_venues:
       venue_data.append({
@@ -148,7 +98,7 @@ def search_venues():
     data.append({
       "id": result.id,
       "name": result.name,
-      "num_upcoming_shows": len(db.session.query(Show).all()),
+      "num_upcoming_shows": len(db.session.query(Show).filter(Show.venue_id == result.id).filter(Show.time > datetime.now()).all()),
     })
   
   response={
@@ -234,22 +184,25 @@ def create_venue_submission():
 
   error = False
   
-  try: 
-    name = request.form['name']
-    city = request.form['city']
-    state = request.form['state']
-    address = request.form['address']
-    phone = request.form['phone']
-    genres = request.form.getlist('genres')
-    image_link = request.form['image_link']
-    facebook_link = request.form['facebook_link']
-    website = request.form['website_link']
-    seeking_talent = True if 'seeking_talent' in request.form else False 
-    seeking_description = request.form['seeking_description']
 
-    venue = Venue(name=name, city=city, state=state, address=address, phone=phone, genres=genres, facebook_link=facebook_link, image_link=image_link, website_link=website, looking=seeking_talent, description=seeking_description)
-    db.session.add(venue)
-    db.session.commit()
+  try: 
+    form = VenueForm(request.form)
+    if form.validate():
+      name = request.form['name']
+      city = request.form['city']
+      state = request.form['state']
+      address = request.form['address']
+      phone = request.form['phone']
+      genres = request.form.getlist('genres')
+      image_link = request.form['image_link']
+      facebook_link = request.form['facebook_link']
+      website = request.form['website_link']
+      seeking_talent = True if 'seeking_talent' in request.form else False 
+      seeking_description = request.form['seeking_description']
+
+      venue = Venue(name=name, city=city, state=state, address=address, phone=phone, genres=genres, facebook_link=facebook_link, image_link=image_link, website_link=website, looking=seeking_talent, description=seeking_description)
+      db.session.add(venue)
+      db.session.commit()
   except: 
     error = True
     db.session.rollback()
