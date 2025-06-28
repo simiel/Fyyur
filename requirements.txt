@@ -1,5 +1,9 @@
-babel
-python-dateutil
-flask-moment
-flask-wtf
-flask_sqlalchemy
+Flask==2.3.3
+Flask-SQLAlchemy==3.0.5
+Flask-Migrate==4.0.5
+Flask-WTF==1.1.1
+Flask-Moment==1.0.5
+WTForms==3.0.1
+Babel==2.12.1
+python-dateutil==2.8.2
+psycopg2-binary==2.9.7

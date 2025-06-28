@@ -179,5 +179,65 @@ python3 app.py
 ```
 
 6. **Verify on the Browser**<br>
-Navigate to project homepage [http://127.0.0.1:5000/](http://127.0.0.1:5000/) or [http://localhost:5000](http://localhost:5000) 
+Navigate to project homepage [http://127.0.0.1:5000/](http://127.0.0.1:5000/) or [http://localhost:5000](http://localhost:5000)
+
+
+## Deployment on Vercel
+
+This application is configured for deployment on Vercel via GitHub integration.
+
+### Prerequisites
+1. A GitHub account
+2. A Vercel account (sign up at https://vercel.com)
+3. A PostgreSQL database (recommended providers):
+   - [Neon](https://neon.tech) - Free PostgreSQL
+   - [Supabase](https://supabase.com) - Free PostgreSQL
+   - [Railway](https://railway.app) - PostgreSQL hosting
+   - [Render](https://render.com) - PostgreSQL hosting
+
+### Step 1: Push to GitHub
+1. Create a new repository on GitHub
+2. Push your code to the repository:
+```bash
+git init
+git add .
+git commit -m "Initial commit"
+git branch -M main
+git remote add origin https://github.com/yourusername/your-repo-name.git
+git push -u origin main
+```
+
+### Step 2: Set up Database
+1. Create a PostgreSQL database using one of the recommended providers
+2. Note down your database connection string (DATABASE_URL)
+
+### Step 3: Deploy on Vercel
+1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
+2. Click "New Project"
+3. Import your GitHub repository
+4. Vercel will automatically detect it's a Python project
+5. Set the following environment variables in Vercel:
+   - `DATABASE_URL`: Your PostgreSQL connection string
+   - `SECRET_KEY`: A secure random string (you can generate one with `python -c "import secrets; print(secrets.token_hex(32))"`)
+   - `DEBUG`: Set to `False`
+6. Deploy!
+
+### Step 4: Initialize Database (First deployment only)
+After your first deployment, you'll need to initialize your database tables. You can do this by:
+1. Using your database provider's console/query editor
+2. Running the SQL commands to create your tables
+3. Or using a migration tool if you have Flask-Migrate set up
+
+### Environment Variables
+The following environment variables are required for production:
+- `DATABASE_URL`: PostgreSQL connection string
+- `SECRET_KEY`: Flask secret key for sessions
+- `DEBUG`: Set to `False` for production
+- `VERCEL_ENV`: Automatically set by Vercel to `production`
+
+### Local Development
+1. Copy `.env.example` to `.env`
+2. Fill in your local database credentials
+3. Install dependencies: `pip install -r requirements.txt`
+4. Run the app: `python app.py`
 

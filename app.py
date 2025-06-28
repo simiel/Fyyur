@@ -2,7 +2,7 @@
 # Imports
 #----------------------------------------------------------------------------#
 
-import json, sys
+import json, sys, os
 import dateutil.parser
 import babel
 from flask import Flask, render_template, request, Response, flash, redirect, url_for
@@ -20,7 +20,13 @@ from flask_migrate import Migrate
 
 app = Flask(__name__)
 moment = Moment(app)
-app.config.from_object('config')
+
+# Use production config if in production environment
+if os.environ.get('VERCEL_ENV') == 'production':
+    app.config.from_object('config_prod')
+else:
+    app.config.from_object('config')
+
 db = SQLAlchemy(app)
 migrate = Migrate(app, db, compare_type=True)
 
